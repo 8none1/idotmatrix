@@ -25,6 +25,7 @@ Nice and simple this time:
 ```
 
 `On` : `05 00 07 01 01`
+
 `Off`: `05 00 07 01 00`
 
 TODO: There is some initialisation to be decoded still.
@@ -66,6 +67,7 @@ This lets you draw a pattern on the screen.  You use the app to trace out the pa
 
 This looks pretty easy too.  In fact, I'm going to just assume that this is what I think it is and not do more testing. I started top right and ended bottom left drawing red pixels.
 
+```text
 y (starting at zero) ---------------|
 x (starting at zero) ------------|  |
 blue -------------------------|  |  |
@@ -73,6 +75,8 @@ green ---------------------|  |  |  |
 red --------------------|  |  |  |  |
 header --|------------| |  |  |  |  |
         `0a 00 05 01 00 ff 00 00 1f 1f`
+```
 
 Let's write a function to draw a spiral in red in the `idotmatrix_controller.py`.
 
+It works!
