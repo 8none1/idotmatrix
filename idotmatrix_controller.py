@@ -18,6 +18,7 @@ WRITE_CMD_UUID           = "0000fa02-0000-1000-8000-00805f9b34fb" # For sending 
 NOTIFICATION_UUID        = "0000fa03-0000-1000-8000-00805f9b34fb" # The UUID that I think notifications are sent from
 #NOTIFICATION_UUID        = "0000fff0-0000-1000-8000-00805f9b34fb" # For enabling notifications from the controller
 #NOTIFICATION_UUID_2      = "0000ae00-0000-1000-8000-00805f9b34fb" #  I think this is just OTA notifications, and not supported by this script
+MIN_BYTE_VALUE = 0x80 # This seems pretty much static for all packets.  I haven't experimented with it though.
 
 COLOUR_DATA = bytearray.fromhex("16 00 7F 00 00 7F 51 00 7F 7F 00 00 7F 00 00 00 7F 7F 00 7F 7F 7F 7F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00")
 print (f"Length of colour data: {len(COLOUR_DATA)}")
@@ -109,6 +110,28 @@ def graffiti_paint(rgb_tuple, x, y):
     graffiti_packet[8] = x
     graffiti_packet[9] = y
     write_packet(graffiti_packet)
+
+def sync_time():
+    # Set the time on the device
+    current_time = time.localtime(time.time())
+    year = current_time.tm_year & 0xff # This is what the Android app does. This suggests that the year is pointless.
+    month = current_time.tm_mon
+    day = current_time.tm_mday
+    dow = current_time.tm_wday + 1 # The controller uses 1-7 for days of the week, but time uses 0-6
+    hour = current_time.tm_hour
+    minute = current_time.tm_min
+    seconds = current_time.tm_sec
+    packet = bytearray.fromhex("0b 00 01 80 e7 0c 12 01 0a 26 10")
+    packet[3] = MIN_BYTE_VALUE
+    packet[4] = year
+    packet[5] = month
+    packet[6] = day
+    packet[7] = dow
+    packet[8] = hour
+    packet[9] = minute
+    packet[10] = seconds
+    print(f"Packet: {packet.hex()}")
+    write_packet(packet)
 
 def decrypt_aes_ecb(ciphertext):
     cipher = AES.new(SECRET_ENCRYPTION_KEY, AES.MODE_ECB)
@@ -272,6 +295,9 @@ elif len(sys.argv) > 1 and sys.argv[1] == "--connect":
                 print("Turning on")
                 switch_on(True)
                 time.sleep(1)
+                print("Syncing time")
+                sync_time()
+                
                 spiral = generate_spiral_coordinates()
                 print(spiral)
                 for each in spiral:
