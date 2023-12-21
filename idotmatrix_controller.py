@@ -6,15 +6,19 @@ import simplepyble
 import time
 import random
 import math
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageSequence
 from collections import OrderedDict
 import zlib
 import sys
+import io
+
+
 
 
 # Some communication with the controller is done using AES ECB encryption
 # Key extracted from the AES library used by the Android app
 SECRET_ENCRYPTION_KEY = bytes([0x34, 0x52, 0x2A, 0x5B, 0x7A, 0x6E, 0x49, 0x2C, 0x08, 0x09, 0x0A, 0x9D, 0x8D, 0x2A, 0x23, 0xF8])
+COLOUR_DATA = bytearray.fromhex("1f 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00")
 
 SERVICE_UUID             = "000000fa-0000-1000-8000-00805f9b34fb"
 WRITE_CMD_UUID           = "0000fa02-0000-1000-8000-00805f9b34fb" # For sending commands to the controller
@@ -23,10 +27,6 @@ NOTIFICATION_UUID        = "0000fa03-0000-1000-8000-00805f9b34fb" # The UUID tha
 #NOTIFICATION_UUID        = "0000fff0-0000-1000-8000-00805f9b34fb" # For enabling notifications from the controller
 #NOTIFICATION_UUID_2      = "0000ae00-0000-1000-8000-00805f9b34fb" #  I think this is just OTA notifications, and not supported by this script
 MIN_BYTE_VALUE = 0x80 # This seems pretty much static for all packets.  I haven't experimented with it though.
-
-COLOUR_DATA = bytearray.fromhex("16 00 7F 00 00 7F 51 00 7F 7F 00 00 7F 00 00 00 7F 7F 00 7F 7F 7F 7F 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00")
-print (f"Length of colour data: {len(COLOUR_DATA)}")
-# Red, Orange, Yellow, Green, Blue, Red, White - or thereabouts
 
 def write_packet(packet):
     #packet = encrypt_aes_ecb(packet)
@@ -278,16 +278,66 @@ def build_string_packet(text_bitmaps, text_mode=0, speed=100, text_colour_mode=1
 
     return header + packet    
 
-
-
-
-
 def print_bitmaps(bitmaps):
     for bitmap in bitmaps:
         for row in bitmap:
             print(''.join(['X' if pixel else '.' for pixel in row]))
         print("\n")
 
+def generate_gif_payload(gif_path):
+    with Image.open(gif_path) as img:
+        print(f"Image size: {img.size}")
+        if img.size != (32, 32):
+            print("Image is too big.")
+            raise Exception("Image is too big")
+    
+    with open(gif_path, "rb") as f:
+        gif_bytes = f.read()
+    
+    crc = zlib.crc32(gif_bytes)
+    print(f"Length: {len(gif_bytes)}")
+    print(f"CRC: {crc}")
+    return (gif_bytes, crc)
+
+def build_gif_packet(gif_payload):
+    crc = gif_payload[1]
+    gif_payload = gif_payload[0]
+    header = bytearray.fromhex("FF FF 01 00 00 FF FF FF FF FF FF FF FF 05 00 0d")
+    header[9]  = crc.to_bytes(4, byteorder='little')[0]
+    header[10] = crc.to_bytes(4, byteorder='little')[1]
+    header[11] = crc.to_bytes(4, byteorder='little')[2]
+    header[12] = crc.to_bytes(4, byteorder='little')[3]
+
+    l = len(gif_payload)
+    total_len = l + (len(header) * 2)
+    header[5] = total_len.to_bytes(4, byteorder='little')[0]
+    header[6] = total_len.to_bytes(4, byteorder='little')[1]
+    header[7] = total_len.to_bytes(4, byteorder='little')[2]
+    header[8] = total_len.to_bytes(4, byteorder='little')[3]
+
+    print(f"Header: {header.hex()}")
+    print(f"Payload: {gif_payload.hex()}")
+    print(f"Payload length: {len(gif_payload)}")
+
+    chunks = []
+    for i in range(0, len(gif_payload), 4096):
+        chunk = gif_payload[i:i+4096]
+        chunks.append(chunk)
+    
+    for i in range(len(chunks)):
+        if i > 0: header[4] = 2
+        else: header[4] = 0
+        chunk_len = len(chunks[i])+len(header)
+        header[0] = chunk_len.to_bytes(2, byteorder='little')[0]
+        header[1] = chunk_len.to_bytes(2, byteorder='little')[1]
+
+        write_packet(header + chunks[i])
+        print(f"\nChunk {i}:")
+        print(' '.join(format(x, '02x') for x in header + chunks[i]))
+    
+
+    
+        
 
 def get_version():
     # Read PCB version - should generate a notification with the info
@@ -338,9 +388,6 @@ def find_devices():
 adapters = simplepyble.Adapter.get_adapters()
 adapter = adapters[0]
 
-# print(string_to_bitmaps("Hello World!"))
-# sys.exit()
-
 if len(sys.argv) > 1 and sys.argv[1] == "--scan":
     adapter.set_callback_on_scan_start(lambda: print("Scan started"))
     adapter.set_callback_on_scan_stop(lambda: print("Scan stopped"))
@@ -389,16 +436,18 @@ elif len(sys.argv) > 1 and sys.argv[1] == "--connect":
                 
                 spiral = generate_spiral_coordinates()
                 print(spiral)
-                #for each in spiral:
-                #    graffiti_paint((random.randint(0,255), random.randint(0,255), random.randint(0,255)), each[0], each[1])
+                for each in spiral:
+                    graffiti_paint((random.randint(0,255), random.randint(0,255), random.randint(0,255)), each[0], each[1])
                 #    time.sleep(0.1)
-                #time.sleep(10)
+                time.sleep(5)
                 text_packet = build_string_packet(string_to_bitmaps("It's Christmas!"), text_mode=1, text_colour=(255,0,255), text_colour_mode=1, text_bg_colour=(255,0,0), text_bg_mode=0)
                 write_packet(text_packet)
-                #time.sleep(10)
-
-                # print("Turning off")
-                # switch_on(False)
+                time.sleep(10)
+                g = generate_gif_payload("fireplace_from_app.gif")
+                build_gif_packet(g)
+                time.sleep(10)
+                print("Turning off")
+                switch_on(False)
             finally:
                 peripheral.disconnect()
 else:
