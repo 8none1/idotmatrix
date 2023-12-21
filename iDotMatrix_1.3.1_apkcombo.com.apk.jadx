@@ -1,0 +1,306 @@
+{
+  "projectVersion": 1,
+  "files": [
+    "iDotMatrix_1.3.1_apkcombo.com.apk"
+  ],
+  "treeExpansions": [
+    [
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "j256.ormlite",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "android",
+      "j256.ormlite",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "blankj.utilcode",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "meis.widget",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "tiro.jlotalibrary",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "scwang.smart",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "refresh",
+      "scwang.smart",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "footer",
+      "refresh",
+      "scwang.smart",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "jieli",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "weigan.loopview",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "csh.tiro.p017cc",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "fft",
+      "csh.tiro.p017cc",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "example.admin.balatetris",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "tech.idotmatrix",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "ota",
+      "tech.idotmatrix",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "wifiled.ipixels.core.text",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "getkeepsafe.relinker",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "chad.library",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "heaton",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "baselib",
+      "heaton",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "ble",
+      "tech.idotmatrix",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ],
+    [
+      "send",
+      "ble",
+      "tech.idotmatrix",
+      "com",
+      "Source code",
+      "iDotMatrix_1.3.1_apkcombo.com.apk"
+    ]
+  ],
+  "codeData": {
+    "comments": [
+      {
+        "nodeRef": {
+          "refType": "METHOD",
+          "declClass": "com.tech.idotmatrix.core.data.TextAgreement",
+          "shortId": "sendTextTo3232(Lcn/com/heaton/blelibrary/ble/model/BleDevice;Lcom/tech/idotmatrix/core/db/bean/Material;ILcom/tech/idotmatrix/core/data/TextAgreement$TextAgreementListener;)V"
+        },
+        "codeRef": {
+          "attachType": "INSN",
+          "index": 927
+        },
+        "comment": "WHAT\u003e!!"
+      },
+      {
+        "nodeRef": {
+          "refType": "METHOD",
+          "declClass": "com.tech.idotmatrix.core.data.TextAgreement",
+          "shortId": "sendTextTo3232(Lcn/com/heaton/blelibrary/ble/model/BleDevice;Lcom/tech/idotmatrix/core/db/bean/Material;ILcom/tech/idotmatrix/core/data/TextAgreement$TextAgreementListener;)V"
+        },
+        "codeRef": {
+          "attachType": "INSN",
+          "index": 991
+        },
+        "comment": "copies source barr2 from 0 in to barr3 at pos 14, for size bytes"
+      }
+    ],
+    "renames": [
+      {
+        "nodeRef": {
+          "refType": "METHOD",
+          "declClass": "com.tech.idotmatrix.core.data.TextAgreement",
+          "shortId": "sendTextTo3232(Lcn/com/heaton/blelibrary/ble/model/BleDevice;Lcom/tech/idotmatrix/core/db/bean/DeviceMaterial;ILcom/tech/idotmatrix/core/data/TextAgreement$TextAgreementListener;)V"
+        },
+        "codeRef": {
+          "attachType": "VAR",
+          "index": 262150
+        },
+        "newName": "maybetextbitmaps"
+      },
+      {
+        "nodeRef": {
+          "refType": "METHOD",
+          "declClass": "com.tech.idotmatrix.core.data.TextAgreement",
+          "shortId": "sendTextTo3232(Lcn/com/heaton/blelibrary/ble/model/BleDevice;Lcom/tech/idotmatrix/core/db/bean/DeviceMaterial;ILcom/tech/idotmatrix/core/data/TextAgreement$TextAgreementListener;)V"
+        },
+        "codeRef": {
+          "attachType": "VAR",
+          "index": 393217
+        },
+        "newName": "textbitmapsarray"
+      },
+      {
+        "nodeRef": {
+          "refType": "METHOD",
+          "declClass": "com.tech.idotmatrix.core.data.TextAgreement",
+          "shortId": "sendTextTo3232(Lcn/com/heaton/blelibrary/ble/model/BleDevice;Lcom/tech/idotmatrix/core/db/bean/DeviceMaterial;ILcom/tech/idotmatrix/core/data/TextAgreement$TextAgreementListener;)V"
+        },
+        "codeRef": {
+          "attachType": "VAR",
+          "index": 524296
+        },
+        "newName": "textmetadataarray"
+      }
+    ]
+  },
+  "openTabs": [
+    {
+      "type": "class",
+      "tabPath": "com.tech.idotmatrix.core.data.TextAgreement",
+      "subPath": "java",
+      "caret": 62519,
+      "view": {
+        "x": 0,
+        "y": 21475
+      }
+    },
+    {
+      "type": "class",
+      "tabPath": "com.tech.idotmatrix.core.db.bean.DeviceMaterial",
+      "subPath": "java",
+      "caret": 756,
+      "view": {
+        "x": 0,
+        "y": 1333
+      }
+    },
+    {
+      "type": "class",
+      "tabPath": "com.tech.idotmatrix.ui.cloud.MaterialDetailsListActivity",
+      "subPath": "java",
+      "caret": 22717,
+      "view": {
+        "x": 0,
+        "y": 5394
+      }
+    },
+    {
+      "type": "class",
+      "tabPath": "com.tech.idotmatrix.AppData",
+      "subPath": "java",
+      "caret": 1406,
+      "view": {
+        "x": 0,
+        "y": 1408
+      }
+    },
+    {
+      "type": "class",
+      "tabPath": "com.heaton.baselib.app.cache.ACache",
+      "subPath": "java",
+      "caret": 27996,
+      "view": {
+        "x": 0,
+        "y": 12023
+      }
+    },
+    {
+      "type": "class",
+      "tabPath": "com.tech.idotmatrix.core.data.ImageAgreement1",
+      "subPath": "java",
+      "caret": 10007,
+      "view": {
+        "x": 0,
+        "y": 4281
+      }
+    }
+  ],
+  "activeTab": 5,
+  "cacheDir": "iDotMatrix_1.3.1_apkcombo.com.apk.cache",
+  "enableLiveReload": false,
+  "searchHistory": [
+    "crc32",
+    "mymaterial",
+    "sendDIYImageData",
+    "[6] \u003d (byte) ",
+    "gif",
+    "4096",
+    "0, 13",
+    "16, 16",
+    "GIF89a",
+    "sendgif",
+    "textColorMode",
+    "3232",
+    "senddata4096",
+    "crc32.crc32",
+    "speed",
+    "bitmap",
+    "[0] \u003d (byte)",
+    "text",
+    "sendtext",
+    "len:"
+  ]
+}

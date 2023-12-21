@@ -6,7 +6,11 @@ import simplepyble
 import time
 import random
 import math
+from PIL import Image, ImageDraw, ImageFont
 from collections import OrderedDict
+import zlib
+import sys
+
 
 # Some communication with the controller is done using AES ECB encryption
 # Key extracted from the AES library used by the Android app
@@ -203,6 +207,88 @@ def set_effect(effect, reverse=0, speed=50, saturation=50, colour_data=COLOUR_DA
     # Now we send the colour data
     write_colour_data(colour_data)
 
+def string_to_bitmaps(input_string, font_path=None):
+    if font_path is None:
+        font_path = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+    font_size = 24
+    font = ImageFont.truetype(font_path, font_size)
+    hex_strings = []
+    for char in input_string:
+        image = Image.new('1', (16, 32), 0)
+        draw = ImageDraw.Draw(image)
+        text_width, text_height = draw.textsize(char, font=font)
+        text_x = (16 - text_width) // 2
+        text_y = (32 - text_height) // 2
+        draw.text((text_x, text_y), char, 1, font=font)
+        bitmap = image.load()
+        byte = 0
+        bit_count = 0
+        hex_string = "05ffffff" # 05 is the font size (32) and ffffff is fixed
+        for y in range(32):
+            for x in range(16):
+                # Accumulate bits in little-endian order
+                byte |= (bitmap[x, y] << bit_count)
+                bit_count += 1
+                if bit_count == 8 or (x == 15 and y == 31):
+                    hex_string += '{:02x}'.format(byte)
+                    byte = 0
+                    bit_count = 0
+        hex_strings.append(hex_string)
+    byte_stream = bytearray.fromhex(''.join(hex_strings))
+    return byte_stream
+
+def build_string_packet(text_bitmaps, text_mode=0, speed=100, text_colour_mode=1, text_colour=(255,0,0), text_bg_mode=0, text_bg_colour=(0,0,0)):
+    # text_bitmaps is a bytearray and we assume it is correctly formatted
+    separator = bytearray.fromhex("05 FF FF FF")
+    num_chars = text_bitmaps.count(separator)
+
+    text_metadata = bytearray.fromhex("FF FF 00 01 00 00 00 00 00 00 00 00 00 00")
+    text_metadata[0] = num_chars.to_bytes(2, byteorder='little')[0]
+    text_metadata[1] = num_chars.to_bytes(2, byteorder='little')[1]
+    text_metadata[4] = text_mode
+    text_metadata[5] = speed
+    text_metadata[6] = text_colour_mode
+    text_metadata[7] = text_colour[0] # r
+    text_metadata[8] = text_colour[1] # g
+    text_metadata[9] = text_colour[2] # b
+    text_metadata[10] = text_bg_mode
+    text_metadata[11] = text_bg_colour[0] # r
+    text_metadata[12] = text_bg_colour[1] # g
+    text_metadata[13] = text_bg_colour[2] # b
+
+    packet = text_metadata + text_bitmaps
+
+    header = bytearray.fromhex("FF FF 03 00 00 FF FF FF FF FF FF FF FF 00 00 0c")
+    total_len = len(packet) + len(header)
+    header[0] = total_len.to_bytes(2, byteorder='little')[0]
+    header[1] = total_len.to_bytes(2, byteorder='little')[1]
+    # header[2] = total_len.to_bytes(4, byteorder='little')[2]
+    # header[3] = total_len.to_bytes(4, byteorder='little')[3]
+
+    textmeta_and_bitmaps = len(packet)
+    header[5] = textmeta_and_bitmaps.to_bytes(4, byteorder='little')[0]
+    header[6] = textmeta_and_bitmaps.to_bytes(4, byteorder='little')[1]
+    header[7] = textmeta_and_bitmaps.to_bytes(4, byteorder='little')[2]
+    header[8] = textmeta_and_bitmaps.to_bytes(4, byteorder='little')[3]
+    crc = zlib.crc32(packet)
+    header[9]  = crc.to_bytes(4, byteorder='little')[0]
+    header[10] = crc.to_bytes(4, byteorder='little')[1]
+    header[11] = crc.to_bytes(4, byteorder='little')[2]
+    header[12] = crc.to_bytes(4, byteorder='little')[3]
+
+    return header + packet    
+
+
+
+
+
+def print_bitmaps(bitmaps):
+    for bitmap in bitmaps:
+        for row in bitmap:
+            print(''.join(['X' if pixel else '.' for pixel in row]))
+        print("\n")
+
+
 def get_version():
     # Read PCB version - should generate a notification with the info
     packet = bytearray.fromhex("03 56 45 00 00 00 00 00 00 00 00 00 00 00 00 00")
@@ -252,6 +338,9 @@ def find_devices():
 adapters = simplepyble.Adapter.get_adapters()
 adapter = adapters[0]
 
+# print(string_to_bitmaps("Hello World!"))
+# sys.exit()
+
 if len(sys.argv) > 1 and sys.argv[1] == "--scan":
     adapter.set_callback_on_scan_start(lambda: print("Scan started"))
     adapter.set_callback_on_scan_stop(lambda: print("Scan stopped"))
@@ -300,12 +389,16 @@ elif len(sys.argv) > 1 and sys.argv[1] == "--connect":
                 
                 spiral = generate_spiral_coordinates()
                 print(spiral)
-                for each in spiral:
-                    graffiti_paint((random.randint(0,255), random.randint(0,255), random.randint(0,255)), each[0], each[1])
-                    time.sleep(0.1)
-                time.sleep(10)
-                print("Turning off")
-                switch_on(False)
+                #for each in spiral:
+                #    graffiti_paint((random.randint(0,255), random.randint(0,255), random.randint(0,255)), each[0], each[1])
+                #    time.sleep(0.1)
+                #time.sleep(10)
+                text_packet = build_string_packet(string_to_bitmaps("It's Christmas!"), text_mode=1, text_colour=(255,0,255), text_colour_mode=1, text_bg_colour=(255,0,0), text_bg_mode=0)
+                write_packet(text_packet)
+                #time.sleep(10)
+
+                # print("Turning off")
+                # switch_on(False)
             finally:
                 peripheral.disconnect()
 else:
