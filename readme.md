@@ -8,6 +8,9 @@ This device is a 32 by 32 RGB matrix.  A quick look at the app suggests that thi
 
 Looking at the initial packets says that these are not encrypted.  Let's find out.
 
+There is another, much better looking, project to control these devices here:  https://github.com/derkalle4/python3-idotmatrix-client
+
+
 ## On & Off
 
 

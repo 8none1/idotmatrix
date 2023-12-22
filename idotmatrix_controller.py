@@ -14,25 +14,14 @@ import io
 
 
 
-
-# Some communication with the controller is done using AES ECB encryption
-# Key extracted from the AES library used by the Android app
-SECRET_ENCRYPTION_KEY = bytes([0x34, 0x52, 0x2A, 0x5B, 0x7A, 0x6E, 0x49, 0x2C, 0x08, 0x09, 0x0A, 0x9D, 0x8D, 0x2A, 0x23, 0xF8])
-COLOUR_DATA = bytearray.fromhex("1f 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00")
-
 SERVICE_UUID             = "000000fa-0000-1000-8000-00805f9b34fb"
 WRITE_CMD_UUID           = "0000fa02-0000-1000-8000-00805f9b34fb" # For sending commands to the controller
-#WRITE_DATA_UUID          = "d44bc439-abfd-45a2-b575-92541612960a" # For sending colour data to the controller
 NOTIFICATION_UUID        = "0000fa03-0000-1000-8000-00805f9b34fb" # The UUID that I think notifications are sent from
-#NOTIFICATION_UUID        = "0000fff0-0000-1000-8000-00805f9b34fb" # For enabling notifications from the controller
-#NOTIFICATION_UUID_2      = "0000ae00-0000-1000-8000-00805f9b34fb" #  I think this is just OTA notifications, and not supported by this script
 MIN_BYTE_VALUE = 0x80 # This seems pretty much static for all packets.  I haven't experimented with it though.
 
 def write_packet(packet):
     #packet = encrypt_aes_ecb(packet)
     peripheral.write_request(SERVICE_UUID, WRITE_CMD_UUID, bytes(packet))
-
-
 
 def build_rainbow_colour_list(num=31):
     colour_list = []
@@ -341,7 +330,7 @@ elif len(sys.argv) > 1 and sys.argv[1] == "--connect":
                 text_packet = build_string_packet(string_to_bitmaps("It's Christmas!"), text_mode=1, text_colour=(random.randint(0,255),random.randint(0,255),random.randint(0,255)), text_colour_mode=1)
                 write_packet(text_packet)
                 time.sleep(10)
-                g = generate_gif_payload("1.GIF")
+                g = generate_gif_payload("10.GIF")
                 build_gif_packet(g)
                 #time.sleep(10)
                 #print("Turning off")
