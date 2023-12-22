@@ -56,7 +56,7 @@ It works!
 
 Text is a series of bitmaps for each letter.
 
- - The first byte of a long payload is the total length including the length byte (I think)
+ - The first byte of a long payload is the total length including the length byte
  - At font size "32" each character is 16 pixels wide and 32 high
  - It appears that each character of the text is sent as it's own bitmap.  So if you have a string of 5 characters, 5 sets of bitmaps are sent
  - The bitmap format is row major, little endian
