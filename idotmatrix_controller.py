@@ -444,7 +444,7 @@ elif len(sys.argv) > 1 and sys.argv[1] == "--connect":
                 text_packet = build_string_packet(string_to_bitmaps("It's Christmas!"), text_mode=1, text_colour=(random.randint(0,255),random.randint(0,255),random.randint(0,255)), text_colour_mode=1)
                 #write_packet(text_packet)
                 #time.sleep(10)
-                g = generate_gif_payload("18.GIF")
+                g = generate_gif_payload("26.GIF")
                 build_gif_packet(g)
                 #time.sleep(10)
                 #print("Turning off")

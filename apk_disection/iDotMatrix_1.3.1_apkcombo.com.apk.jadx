@@ -219,66 +219,76 @@
   "openTabs": [
     {
       "type": "class",
-      "tabPath": "com.tech.idotmatrix.core.data.TextAgreement",
+      "tabPath": "com.tech.idotmatrix.ble.send.SendCore",
       "subPath": "java",
-      "caret": 62519,
+      "caret": 60723,
       "view": {
         "x": 0,
-        "y": 21475
+        "y": 3237
       }
     },
     {
       "type": "class",
-      "tabPath": "com.tech.idotmatrix.core.db.bean.DeviceMaterial",
+      "tabPath": "com.tech.idotmatrix.ui.pattern.DeviceMaterialChildFragment",
       "subPath": "java",
-      "caret": 756,
+      "caret": 11160,
       "view": {
         "x": 0,
-        "y": 1333
-      }
-    },
-    {
-      "type": "class",
-      "tabPath": "com.tech.idotmatrix.ui.cloud.MaterialDetailsListActivity",
-      "subPath": "java",
-      "caret": 22717,
-      "view": {
-        "x": 0,
-        "y": 5394
-      }
-    },
-    {
-      "type": "class",
-      "tabPath": "com.tech.idotmatrix.AppData",
-      "subPath": "java",
-      "caret": 1406,
-      "view": {
-        "x": 0,
-        "y": 1408
-      }
-    },
-    {
-      "type": "class",
-      "tabPath": "com.heaton.baselib.app.cache.ACache",
-      "subPath": "java",
-      "caret": 27996,
-      "view": {
-        "x": 0,
-        "y": 12023
+        "y": 4391
       }
     },
     {
       "type": "class",
       "tabPath": "com.tech.idotmatrix.core.data.ImageAgreement1",
       "subPath": "java",
-      "caret": 10007,
+      "caret": 8212,
       "view": {
         "x": 0,
-        "y": 4281
+        "y": 2086
+      }
+    },
+    {
+      "type": "class",
+      "tabPath": "com.tech.idotmatrix.core.data.TextAgreement",
+      "subPath": "java",
+      "caret": 63302,
+      "view": {
+        "x": 0,
+        "y": 19708
+      }
+    },
+    {
+      "type": "class",
+      "tabPath": "com.tech.idotmatrix.core.data.GifAgreement",
+      "subPath": "java",
+      "caret": 6383,
+      "view": {
+        "x": 0,
+        "y": 1852
+      }
+    },
+    {
+      "type": "class",
+      "tabPath": "com.tech.idotmatrix.AppData",
+      "subPath": "java",
+      "caret": 2291,
+      "view": {
+        "x": 0,
+        "y": 982
+      }
+    },
+    {
+      "type": "class",
+      "tabPath": "com.tech.idotmatrix.core.data.DeviceMaterialTimeConvert",
+      "subPath": "java",
+      "caret": 233,
+      "view": {
+        "x": 0,
+        "y": 0
       }
     }
   ],
-  "activeTab": 5,
+  "activeTab": 6,
   "cacheDir": "iDotMatrix_1.3.1_apkcombo.com.apk.cache",
   "enableLiveReload": false,
   "searchHistory": [
