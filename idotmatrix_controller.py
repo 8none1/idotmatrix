@@ -334,6 +334,7 @@ def build_gif_packet(gif_payload):
         write_packet(header + chunks[i])
         print(f"\nChunk {i}:")
         print(' '.join(format(x, '02x') for x in header + chunks[i]))
+        time.sleep(1)
     
 
     
@@ -436,18 +437,18 @@ elif len(sys.argv) > 1 and sys.argv[1] == "--connect":
                 
                 spiral = generate_spiral_coordinates()
                 print(spiral)
-                for each in spiral:
-                    graffiti_paint((random.randint(0,255), random.randint(0,255), random.randint(0,255)), each[0], each[1])
-                #    time.sleep(0.1)
-                time.sleep(5)
-                text_packet = build_string_packet(string_to_bitmaps("It's Christmas!"), text_mode=1, text_colour=(255,0,255), text_colour_mode=1, text_bg_colour=(255,0,0), text_bg_mode=0)
-                write_packet(text_packet)
-                time.sleep(10)
-                g = generate_gif_payload("fireplace_from_app.gif")
+                # for each in spiral:
+                #     graffiti_paint((random.randint(0,255), random.randint(0,255), random.randint(0,255)), each[0], each[1])
+                # #    time.sleep(0.1)
+                # time.sleep(5)
+                text_packet = build_string_packet(string_to_bitmaps("It's Christmas!"), text_mode=1, text_colour=(random.randint(0,255),random.randint(0,255),random.randint(0,255)), text_colour_mode=1)
+                #write_packet(text_packet)
+                #time.sleep(10)
+                g = generate_gif_payload("18.GIF")
                 build_gif_packet(g)
-                time.sleep(10)
-                print("Turning off")
-                switch_on(False)
+                #time.sleep(10)
+                #print("Turning off")
+                #switch_on(False)
             finally:
                 peripheral.disconnect()
 else:

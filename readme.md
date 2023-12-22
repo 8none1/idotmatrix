@@ -54,10 +54,9 @@ It works!
 
 ## Text
 
-Text looks like it is a bitmap of the whole screen. I will keep a list of discoveries here as I go:
+Text is a series of bitmaps for each letter.
 
  - The first byte of a long payload is the total length including the length byte (I think)
- - A single line on the display has to have the same colour.  That is, each line must have a colour component for the whole line
  - At font size "32" each character is 16 pixels wide and 32 high
  - It appears that each character of the text is sent as it's own bitmap.  So if you have a string of 5 characters, 5 sets of bitmaps are sent
  - The bitmap format is row major, little endian
@@ -69,9 +68,9 @@ Handy tool:  http://dotmatrixtool.com/#
 
 
 
-### Mostly decoded text payload
+### Text payload
 
-Try and decode the bytes using the Java code:
+#### Header 1
 
 ```text
                          0 1  2  3  4  5 6 7 8  9101112  1314 15
@@ -86,6 +85,8 @@ if `thing` is 12, then 00,00 else something about time---|--| |
 `thing` ------------------------------------------------------|
 
 ```
+
+#### Header 2 - Text Metadata
 
 ```text
                                   0 1  2  3  4  5  6  7  8  9  10 11 12 13   
@@ -103,7 +104,7 @@ text background col mode --------------------------------------|  |  |  |  |
 bg r -------------------------------------------------------------|  |  |  |
 bg g ----------------------------------------------------------------|  |  |
 bg b -------------------------------------------------------------------|  |
-this is the start the character bitmaps  ----------------------------------| 
+this is the start the character bitmap   ----------------------------------| 
 ```
 
 The 0x05 (or a 6) means that the font size (and so the bitmap size?) is "32".  A 2 or a 3 would be for size "16".
@@ -117,11 +118,9 @@ In the payload the CRC32 would be `aa 7d 31 49` (i.e. little endian).
 
 ### multi character text
 
-```text
-72 01 03 00 00 62 01 00 00 11 cf 8d 01 00 00 0c 050000010064010000ff00000000 05 ff ff ff 000000000000000000001c001c001c001c001c001c001c009c0fdc1f7c3c3c383c381c381c381c381c381c381c381c381c381c3800000000000000000000000005ffffff000000000000000000000000000000000000000000000000e007f80f3c1c1c180e38fe3ffe3f0e000e000e381c383c1cf80fe00300000000000000000000000005ffffff0000000000000000000080038003800380038003800380038003800380038003800380038003800380038003800380038003800300000000000000000000000005ffffff0000000000000000000080038003800380038003800380038003800380038003800380038003800380038003800380038003800300000000000000000000000005ffffff000000000000000000000000000000000000000000000000e007f00f381c1c380e700e700e700e700e700e701c38381cf00fe007000000000000000000000000
-```
+You send multiple characters one at a time.  Each character starts with a header. `05FFFFFF` - where the `05` indicates the size. 5 is 32 bits.
 
-I think that the packets are just split in to maximum 4k chunks.
+The maximum payload size is 4kB. I haven't implemented anything to test this for text, but it works for GIFs.  See below.
 
 ### Text Mode
 
@@ -157,5 +156,43 @@ This is all I've tested so far.  Please update if you have others.
 ```text
 0 - Off
 1 - Solid colour
+```
+
+## GIFs
+
+My device is 32 x 32 pixels.  All GIFs need to be 32 x 32.  You can use [Gifsicle](https://www.lcdf.org/gifsicle/man.html) to batch resize.
+Each gif upload starts with a master header.  The payload must be chunked in to 4k blocks.  At the start of each 4k block is a secondary header.
+The payload does not count towards the 4k chunk size it seems.  So 4096 + 16 bytes total size.
+
+When you have finished sending one block you should wait for confirmation from the device via a notification `0500010001`.  Or, much easier, just sleep for a second.
+When the upload is complete you should get a `0500010003`.  I haven't implemented any kind of flow control to test this yet.
+
+There is a very rudimentary implementation in the `idotmatrix_controller.py` script.
+
+### Master header
+
+```text
+                                         0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15 
+                                         10 10 01 00 00 b9 18 00 00 db 42 cb 14 05 00 0d
+Payload size for this block inc header --|---| |  |  |  |--------|  |---------| |------|    
+fixed 01 --------------------------------------|  |  |  |        |  |         | |      |
+fixed 00 -----------------------------------------|  |  |        |  |         | |      | 
+indications multi chunk. 0 = 1 chunk 2 = > 1 --------|  |        |  |         | |      |
+total payload size inc headers over all chunks  --------|--------|  |         | |      |
+CRC32 whole payload only, not headers ------------------------------|---------| |      |
+fixed? -------------------------------------------------------------------------|------|
+```
+
+### Secondary headers
+
+```text
+                                         c9 08 01 00 02 b9 18 00 00 db 42 cb 14 05 00 0d
+Payload size for this block inc header --|---| |  |  |  |---------| |---------| |------|    
+fixed 01 --------------------------------------|  |  |  |         | |         | |      |
+fixed 00 -----------------------------------------|  |  |         | |         | |      | 
+multi chunk indication as above ---------------------|  |         | |         | |      |
+total payload inc headers over all chunks size size ----|---------| |         | |      |
+CRC32 whole payload only, not headers ------------------------------|---------| |      |
+fixed? something about `timeSign`? doesnt make sense ---------------------------|------|
 ```
 
