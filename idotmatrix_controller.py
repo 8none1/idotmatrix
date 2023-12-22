@@ -32,32 +32,7 @@ def write_packet(packet):
     #packet = encrypt_aes_ecb(packet)
     peripheral.write_request(SERVICE_UUID, WRITE_CMD_UUID, bytes(packet))
 
-def write_colour_data(packet):
-    peripheral.write_request(SERVICE_UUID, WRITE_DATA_UUID, bytes(packet))
 
-def build_colour_data_packet(colour_list):
-    # Pass in a list of tuples with the 8 bit rgb colours you want
-    # e.g. my_colours = [(255, 0, 0), (0, 255, 0), (0, 0, 255)]
-    length = len(colour_list)
-    print(f"Length: {length}")
-    if length > 32:
-        print("Too many colours. Truncating to 32")
-        colour_list = colour_list[:31]
-        length = 32
-    NEW_COLOUR_DATA = []
-    NEW_COLOUR_DATA.append(length*3)
-    NEW_COLOUR_DATA.append(0)
-    for each in colour_list:
-        r, g, b = each
-        NEW_COLOUR_DATA.append(r)
-        NEW_COLOUR_DATA.append(g)
-        NEW_COLOUR_DATA.append(b)
-
-    # Clear out the rest of the packet
-    if length < 32:
-        for i in range(length, 32):
-            NEW_COLOUR_DATA.extend([0, 0, 0])
-    return bytearray(NEW_COLOUR_DATA)
 
 def build_rainbow_colour_list(num=31):
     colour_list = []
@@ -137,17 +112,6 @@ def sync_time():
     print(f"Packet: {packet.hex()}")
     write_packet(packet)
 
-def decrypt_aes_ecb(ciphertext):
-    cipher = AES.new(SECRET_ENCRYPTION_KEY, AES.MODE_ECB)
-    plaintext = cipher.decrypt(ciphertext)
-    return plaintext
-
-def encrypt_aes_ecb(plaintext):
-    cipher = AES.new(SECRET_ENCRYPTION_KEY, AES.MODE_ECB)
-    ciphertext = cipher.encrypt(plaintext)
-    print(f"Encrypted: {ciphertext.hex()}")
-    return ciphertext
-
 def switch_on(state):
     packet = bytearray.fromhex("05 00 07 01 01")
     if state is True:
@@ -155,57 +119,6 @@ def switch_on(state):
     else:
         packet[4] = 0
     write_packet(packet)
-
-def set_colour(r, g, b):
-    # Device seems to use 5 bit colour values, we will convert from 8 bit
-    # I don't know if it's 5 bits per channel, or if green has 6 bits.  I'm going to
-    # assume 5 bits per channel for now.
-    # Also the colour packets seem to be duplicated.  Not sure why yet.  Need to play
-    # The Android app does this:
-    """
-        byte[] bArr = {15, 83, 71, 76, 83, (byte) lightsColor.getModelIndex(), (byte) (1 ^ z), 100, (byte) lightsColor.getSpeed(), red, green, blue, red2, green2, blue2, (byte) lightsColor.getSaturation()};
-    """
-    #                           0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15
-    # red 9 & 12 ------------------------------------------v--------v
-    # green 10 & 13 ---------------------------------------|--v-----|--v
-    # blue 11 & 14 ----------------------------------------|--|--v--|--|--v
-    packet = bytearray.fromhex("0F 53 47 4C 53 00 00 64 50 1F 00 00 1F 00 00 32")
-    # brightness ---------------------------------|-----|--------------------^ (0-100?)  NOPE - this is not brightness.
-    # speed --------------------------------------|-----^
-    # reverse ------------------------------------^
-    # r = int(r >> 3) # This is deliberately limited in the app to 5 bits.  But 8 bits works just fine!
-    # g = int(g >> 3)
-    # b = int(b >> 3)
-    packet[9] = r
-    packet[12] = r
-    packet[10] = g
-    packet[13] = g
-    packet[11] = b
-    packet[14] = b
-    write_packet(packet)
-
-def set_effect(effect, reverse=0, speed=50, saturation=50, colour_data=COLOUR_DATA):
-    #                                          0  1  2  3  4  5  6  7  8  9  10 11 12 13 14 15
-    #                                          0A 4D 55 4C 54 08 00 64 50 07 32 00 00 00 00 00
-    # header  ---------------------------------|            | |  |  |   |  |  | |            |
-    # effect number- -----------------------------------------|  |  |   |  |  | |            |
-    # reverse? --------------------------------------------------/  |   |  |  | |            |  
-    # fixed (led count?) -------------------------------------------/   |  |  | |            |
-    # speed ------------------------------------------------------------/  |  | |            |
-    # colour array size? --------------------------------------------------/  | |            |
-    # saturation (perhaps actually brightness?)-------------------------------/ |            |
-    # always zero? -------------------------------------------------------------/------------|
-    # NB: Effects seem to only support 7 colours max
-    if effect > 11: effect=11 # if you use an effect higher than this, you will fry your lights.  I learned this the hard way.
-
-    packet = bytearray.fromhex("0A 4D 55 4C 54 08 00 64 50 07 32 00 00 00 00 00")
-    packet[5]  = effect
-    packet[6]  = reverse
-    packet[8]  = speed
-    packet[10] = saturation
-    write_packet(packet)
-    # Now we send the colour data
-    write_colour_data(colour_data)
 
 def string_to_bitmaps(input_string, font_path=None):
     if font_path is None:
@@ -335,23 +248,10 @@ def build_gif_packet(gif_payload):
         print(f"\nChunk {i}:")
         print(' '.join(format(x, '02x') for x in header + chunks[i]))
         time.sleep(1)
-    
+ 
 
-    
-        
-
-def get_version():
-    # Read PCB version - should generate a notification with the info
-    packet = bytearray.fromhex("03 56 45 00 00 00 00 00 00 00 00 00 00 00 00 00")
-    write_packet(packet)
-    # Read firmware version - should generate a notification with the info
-    packet = bytearray.fromhex("03 56 45 01 00 00 00 00 00 00 00 00 00 00 00 00")
-    write_packet(packet)
-    
+   
 def response_decode(response):
-    #print(f"Response: {response.hex()}")
-    # The response is encrypted, so decrypt it
-    #response = decrypt_aes_ecb(response)
     print(f"Response: {response.hex()}")
 
 def connect_to_device(mac_addr):
@@ -408,9 +308,6 @@ elif len(sys.argv) > 1 and sys.argv[1] == "--connect":
     # There are no examples of how to instantiate a peripheral object from a mac address
     # it probably can be done, but I can't work it out from the source, so for now
     # just use scan to find it by name
-    #r = build_colour_data_packet(build_rainbow_colour_list(100))
-    #r = build_rainbow_colour_list(100)
-    #print(f"Colour data: {r.hex()}")
     print("Scanning for devices")
     adapter.scan_for(2000)
     peripherals = adapter.scan_get_results()
@@ -442,8 +339,8 @@ elif len(sys.argv) > 1 and sys.argv[1] == "--connect":
                 # #    time.sleep(0.1)
                 # time.sleep(5)
                 text_packet = build_string_packet(string_to_bitmaps("It's Christmas!"), text_mode=1, text_colour=(random.randint(0,255),random.randint(0,255),random.randint(0,255)), text_colour_mode=1)
-                #write_packet(text_packet)
-                #time.sleep(10)
+                write_packet(text_packet)
+                time.sleep(10)
                 g = generate_gif_payload("26.GIF")
                 build_gif_packet(g)
                 #time.sleep(10)
