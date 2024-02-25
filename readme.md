@@ -199,3 +199,10 @@ CRC32 whole payload only, not headers ------------------------------|---------| 
 fixed? something about `timeSign`? doesnt make sense ---------------------------|------|
 ```
 
+## Other projects that might be of interest
+
+- [iDotMatrix](https://github.com/8none1/idotmatrix)
+- [Zengge LEDnet WF](https://github.com/8none1/zengge_lednetwf)
+- [iDealLED](https://github.com/8none1/idealLED)
+- [BJ_LED](https://github.com/8none1/bj_led)
+- [ELK BLEDOB](https://github.com/8none1/elk-bledob)
