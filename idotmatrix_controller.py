@@ -101,6 +101,14 @@ def sync_time():
     print(f"Packet: {packet.hex()}")
     write_packet(packet)
 
+
+def send_reset_command():
+    packet = bytearray.fromhex("04 00 03 80")
+    write_packet(packet)
+    # Maybe that first command is all that's needed?  Try commenting out this second packet below and see if it still works...
+    packet = bytearray.fromhex("05 00 04 80 50")
+    write_packet(packet)
+
 def switch_on(state):
     packet = bytearray.fromhex("05 00 07 01 01")
     if state is True:
@@ -321,18 +329,20 @@ elif len(sys.argv) > 1 and sys.argv[1] == "--connect":
                 print("Syncing time")
                 sync_time()
                 
-                spiral = generate_spiral_coordinates()
-                print(spiral)
+                #spiral = generate_spiral_coordinates()
+                #print(spiral)
                 # for each in spiral:
                 #     graffiti_paint((random.randint(0,255), random.randint(0,255), random.randint(0,255)), each[0], each[1])
                 # #    time.sleep(0.1)
                 # time.sleep(5)
                 text_packet = build_string_packet(string_to_bitmaps("It's Christmas!"), text_mode=1, text_colour=(random.randint(0,255),random.randint(0,255),random.randint(0,255)), text_colour_mode=1)
                 write_packet(text_packet)
-                time.sleep(10)
+                time.sleep(5)
                 g = generate_gif_payload("assets_test/luigi32.gif")
                 build_gif_packet(g)
-                #time.sleep(10)
+                time.sleep(5)
+                print("Resetting device...")
+                send_reset_command()
                 #print("Turning off")
                 #switch_on(False)
             finally:
